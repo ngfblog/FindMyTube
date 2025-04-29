@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חיפוש מתקדם ב-YouTube</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #ff0000;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-section {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .search-button {
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .search-button:hover {
+            background-color: #cc0000;
+        }
+        .filters-container {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .filter-section {
+            margin-bottom: 15px;
+        }
+        .filter-section h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .filter-options label {
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .filter-options select, .filter-options input {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .toggle-filters {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .toggle-filters:hover {
+            background-color: #e0e0e0;
+        }
+        .hidden {
+            display: none;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>חיפוש מתקדם ב-YouTube</h1>
+        
+        <div class="search-section">
+            <input type="text" id="search-input" placeholder="הקלד מילות חיפוש כאן...">
+            <button class="search-button" onclick="performSearch()">חפש</button>
+        </div>
+        
+        <button class="toggle-filters" onclick="toggleFilters()">הצג/הסתר אפשרויות סינון</button>
+        
+        <div class="filters-container" id="filters">
+            <div class="filter-section">
+                <h3>תאריך העלאה</h3>
+                <div class="filter-options">
+                    <label><input type="radio" name="upload-date" value="hour"> בשעה האחרונה</label>
+                    <label><input type="radio" name="upload-date" value="today"> היום</label>
+                    <label><input type="radio" name="upload-date" value="week"> השבוע</label>
+                    <label><input type="radio" name="upload-date" value="month"> החודש</label>
+                    <label><input type="radio" name="upload-date" value="year"> השנה</label>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>סוג</h3>
+                <div class="filter-options">
+                    <label><input type="checkbox" id="video-type"> סרטונים</label>
+                    <label><input type="checkbox" id="channel-type"> ערוצים</label>
+                    <label><input type="checkbox" id="playlist-type"> פלייליסטים</label>
+                    <label><input type="checkbox" id="movie-type"> סרטים</label>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>משך</h3>
+                <div class="filter-options">
+                    <label><input type="radio" name="duration" value="short"> קצר (פחות מ-4 דקות)</label>
+                    <label><input type="radio" name="duration" value="medium"> בינוני (4-20 דקות)</label>
+                    <label><input type="radio" name="duration" value="long"> ארוך (יותר מ-20 דקות)</label>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>תכונות</h3>
+                <div class="filter-options">
+                    <label><input type="checkbox" id="hd-feature"> HD</label>
+                    <label><input type="checkbox" id="subtitles-feature"> כתוביות</label>
+                    <label><input type="checkbox" id="cc-feature"> רישיון Creative Commons</label>
+                    <label><input type="checkbox" id="live-feature"> שידורים חיים</label>
+                    <label><input type="checkbox" id="4k-feature"> 4K</label>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>מיון לפי</h3>
+                <div class="filter-options">
+                    <select id="sort-by">
+                        <option value="relevance">רלוונטיות</option>
+                        <option value="date">תאריך העלאה</option>
+                        <option value="views">מספר צפיות</option>
+                        <option value="rating">דירוג</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results" id="results">
+            <!-- תוצאות החיפוש יוצגו כאן -->
+        </div>
+        
+        <div class="footer">
+            <p>כלי חיפוש לא רשמי של YouTube. אפליקציה זו אינה מסונפת ל-YouTube או Google.</p>
+        </div>
+    </div>
+
+    <script>
+        // הסתרת אפשרויות סינון כברירת מחדל
+        document.getElementById('filters').classList.add('hidden');
+        
+        // פונקציה להצגה או הסתרה של אפשרויות סינון
+        function toggleFilters() {
+            const filters = document.getElementById('filters');
+            filters.classList.toggle('hidden');
+        }
+        
+        // פונקציה לביצוע החיפוש
+        function performSearch() {
+            const searchQuery = document.getElementById('search-input').value.trim();
+            
+            if (!searchQuery) {
+                alert('אנא הזן מילות חיפוש');
+                return;
+            }
+            
+            // איסוף כל הסינונים שנבחרו
+            const uploadDate = document.querySelector('input[name="upload-date"]:checked')?.value || '';
+            const duration = document.querySelector('input[name="duration"]:checked')?.value || '';
+            const sortBy = document.getElementById('sort-by').value;
+            
+            const filters = {
+                videoType: document.getElementById('video-type').checked,
+                channelType: document.getElementById('channel-type').checked,
+                playlistType: document.getElementById('playlist-type').checked,
+                movieType: document.getElementById('movie-type').checked,
+                hdFeature: document.getElementById('hd-feature').checked,
+                subtitlesFeature: document.getElementById('subtitles-feature').checked,
+                ccFeature: document.getElementById('cc-feature').checked,
+                liveFeature: document.getElementById('live-feature').checked,
+                fourKFeature: document.getElementById('4k-feature').checked
+            };
+            
+            // בניית מחרוזת URL לחיפוש ב-YouTube עם כל הפרמטרים
+            let youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+            
+            // הוספת פרמטרים של סינון לפי הבחירות שנעשו
+            if (uploadDate) {
+                // המרת ערכים לפורמט שיתאים ל-YouTube
+                const dateParams = {
+                    'hour': 'EgIIAQ%253D%253D',
+                    'today': 'EgQIAhAB',
+                    'week': 'EgQIAxAB',
+                    'month': 'EgQIBBAB',
+                    'year': 'EgQIBRAB'
+                };
+                youtubeSearchUrl += `&sp=${dateParams[uploadDate]}`;
+            }
+            
+            if (duration) {
+                // המרת ערכים לפורמט שיתאים ל-YouTube
+                const durationParams = {
+                    'short': 'EgQQARgB',
+                    'medium': 'EgQQARgC',
+                    'long': 'EgQQARgD'
+                };
+                youtubeSearchUrl += `&sp=${durationParams[duration]}`;
+            }
+            
+            // פתיחת החיפוש בחלון חדש
+            window.open(youtubeSearchUrl, '_blank');
+            
+            // הצגת תוצאות חיפוש דמה במקרה שהמשתמש לא ניגש ל-URL
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <p>מבצע חיפוש עבור: "${searchQuery}"</p>
+                <p>עם הסינונים הבאים:</p>
+                <ul>
+                    ${uploadDate ? `<li>תאריך העלאה: ${uploadDate}</li>` : ''}
+                    ${duration ? `<li>משך: ${duration}</li>` : ''}
+                    <li>מיון לפי: ${sortBy}</li>
+                </ul>
+                <p>נפתח חלון חיפוש חדש ב-YouTube...</p>
+            `;
+        }
+    </script>
+</body>
+</html>
